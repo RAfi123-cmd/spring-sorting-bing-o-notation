@@ -8,6 +8,12 @@ public class SortMetrics {
     private long writes = 0;
     private long elapsedNanos = 0;
 
+    private long currentRecursionDepth = 0;
+    private long peakRecursionDepth = 0;
+ 
+    private long currentAuxiliaryArrayElements = 0;
+    private long peakAuxiliaryArrayElements = 0;
+
 
     public void incrementComparisons(){
         comparisons++;
@@ -23,6 +29,32 @@ public class SortMetrics {
 
     public double getElapsedMillis(){
         return elapsedNanos / 1_000_000.0;
+    }
+
+    public void exitRecursion(){
+        currentRecursionDepth--;
+    }
+
+    public void enterRecursion(){
+        currentRecursionDepth++;
+        if (currentRecursionDepth > peakAuxiliaryArrayElements) {
+            peakRecursionDepth = currentRecursionDepth;
+        }
+    }
+
+    public void allocateAuxiliaryArray(long elements){
+        currentAuxiliaryArrayElements += elements;
+        if (currentAuxiliaryArrayElements > peakAuxiliaryArrayElements) {
+            peakAuxiliaryArrayElements = currentAuxiliaryArrayElements;
+        }
+    }
+
+    public void releaseAuxiliaryArray(long elements){
+        currentAuxiliaryArrayElements -= elements;
+    }
+
+    public long getTotalAuxiliaryArray(){
+        return peakRecursionDepth + peakAuxiliaryArrayElements;
     }
 
     

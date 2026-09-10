@@ -6,11 +6,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.example.sorting_app.sorting.SortAlgorithm;
+import com.example.sorting_app.sorting.AbstractSortAlgorithm;
 import com.example.sorting_app.sorting.SortMetrics;
 
 @Component
-public class SelectionSortAlgorithm implements SortAlgorithm{
+public class SelectionSortAlgorithm extends AbstractSortAlgorithm{
 
     @Override
     public String getKey() {
@@ -37,7 +37,13 @@ public class SelectionSortAlgorithm implements SortAlgorithm{
     }
 
     @Override
-    public <T> void sort(List<T> list, Comparator<T> comparator, SortMetrics metrics) {
+    public String getSpaceComplexity() {
+        // TODO Auto-generated method stub
+        return "O(1)";
+    }
+
+    @Override
+    protected <T> void doSort(List<T> list, Comparator<T> comparator, SortMetrics metrics) {
         // TODO Auto-generated method stub
         int n = list.size();
         for (int i = 0; i < n - 1; i++) {
@@ -54,4 +60,6 @@ public class SelectionSortAlgorithm implements SortAlgorithm{
             }
         }
     }
+
+    
 }

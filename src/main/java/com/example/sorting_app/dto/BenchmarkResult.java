@@ -6,9 +6,12 @@ import lombok.AllArgsConstructor;
 public class BenchmarkResult {
     private String algorithm;
     private String timeComplexity;
-    private int dateSize;
+    private String spaceComplexity;
+    private int dataSize;
     private long comparisons;
     private long writes;
+    private long peakRecursionDepth;
+    private long peakAuxiliaryArrayElements;
     private double elapsedMillis;
     private String note;
     
@@ -24,11 +27,19 @@ public class BenchmarkResult {
     public void setTimeComplexity(String timeComplexity) {
         this.timeComplexity = timeComplexity;
     }
-    public int getDateSize() {
-        return dateSize;
+
+    public String getSpaceComplexity() {
+        return spaceComplexity;
     }
-    public void setDateSize(int dateSize) {
-        this.dateSize = dateSize;
+    public void setSpaceComplexity(String spaceComplexity) {
+        this.spaceComplexity = spaceComplexity;
+    }
+
+    public int getDataSize() {
+        return dataSize;
+    }
+    public void setDataSize(int dataSize) {
+        this.dataSize = dataSize;
     }
     public long getComparisons() {
         return comparisons;
@@ -47,6 +58,18 @@ public class BenchmarkResult {
     }
     public void setElapsedMillis(double elapsedMillis) {
         this.elapsedMillis = elapsedMillis;
+    }
+    public long getPeakRecursionDepth() {
+        return peakRecursionDepth;
+    }
+    public void setPeakRecursionDepth(long peakRecursionDepth) {
+        this.peakRecursionDepth = peakRecursionDepth;
+    }
+    public long getPeakAuxiliaryArrayElements() {
+        return peakAuxiliaryArrayElements;
+    }
+    public void setPeakAuxiliaryArrayElements(long peakAuxiliaryArrayElements) {
+        this.peakAuxiliaryArrayElements = peakAuxiliaryArrayElements;
     }
     public String getNote() {
         return note;

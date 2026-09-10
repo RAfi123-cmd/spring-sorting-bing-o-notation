@@ -1,22 +1,8 @@
 package com.example.sorting_app.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.example.sorting_app.constant.AppConstant;
+import com.example.sorting_app.constant.SortAlgorithmKeys;
+import com.example.sorting_app.constant.SortableFields;
 import com.example.sorting_app.constant.SortingConstant;
 import com.example.sorting_app.dto.BenchmarkResult;
 import com.example.sorting_app.dto.SortResponse;
@@ -26,50 +12,53 @@ import com.example.sorting_app.sorting.SortAlgorithm;
 import com.example.sorting_app.sorting.SortAlgorithmRegistry;
 import com.example.sorting_app.sorting.SortMetrics;
 import com.example.sorting_app.sorting.TransactionFieldComparators;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@RestController 
-@RequestMapping (SortingConstant.BASE_PATH)
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+@RestController
+@RequestMapping(SortingConstant.BASE_PATH)
 @RequiredArgsConstructor
 public class SortingController {
-    private static final int QUADRATIC_SAFE_LIMIT = 20_000;
 
     private final TransactionRepository transactionRepository;
     private final SortAlgorithmRegistry algorithmRegistry;
 
     @GetMapping(SortingConstant.ALGORITHMS_PATH)
-    public ResponseEntity<?> listAlgorithms() {
-
-        List<Map<String, Object>> algorithms = algorithmRegistry.getAll().stream()
+    public List<Map<String, Object>> listAlgorithms() {
+        return algorithmRegistry.getAll().stream()
                 .map(a -> Map.<String, Object>of(
                         "key", a.getKey(),
                         "name", a.getDisplayName(),
-                        "complexity", a.getTimeComplexity()))
+                        "timeComplexity", a.getTimeComplexity(),
+                        "spaceComplexity", a.getSpaceComplexity()))
                 .toList();
-
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("message", "Algorithms retrieved successfully");
-        response.put("data", algorithms);
-
-        return ResponseEntity.ok(response);
     }
 
-   
+
     @GetMapping(SortingConstant.SORT_PATH)
     public SortResponse sort(
             @RequestParam String algorithm,
-            @RequestParam(defaultValue = "unitPrice") String field,
-            @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(defaultValue = "1000") int limit,
-            @RequestParam(defaultValue = "false") boolean force) {
+            @RequestParam(defaultValue = SortableFields.UNIT_PRICE) String field,
+            @RequestParam(defaultValue = AppConstant.ORDER_ASC) String order,
+            @RequestParam(defaultValue = AppConstant.DEFAULT_LIMIT) int limit,
+            @RequestParam(defaultValue = AppConstant.DEFAULT_FORCE) boolean force) {
 
         SortAlgorithm algo = algorithmRegistry.get(algorithm);
 
-        if (algo.isQuadratic() && limit > QUADRATIC_SAFE_LIMIT && !force) {
+        if (algo.isQuadratic() && limit > AppConstant.QUADRATIC_SAFE_LIMIT && !force) {
             throw new IllegalArgumentException(
                     algo.getDisplayName() + " is O(n^2); limit " + limit +
-                            " exceeds the safe cap of " + QUADRATIC_SAFE_LIMIT +
+                            " exceeds the safe cap of " + AppConstant.QUADRATIC_SAFE_LIMIT +
                             ". Pass force=true to override (may be slow).");
         }
 
@@ -77,23 +66,23 @@ public class SortingController {
                 transactionRepository.findAll(PageRequest.of(0, limit)).getContent());
 
         Comparator<Transaction> comparator = TransactionFieldComparators.forField(field, order);
-        SortMetrics metrics = new SortMetrics();
 
-        long start = System.nanoTime();
-        algo.sort(data, comparator, metrics);
-        metrics.setElapsedNanos(System.nanoTime() - start);
+        SortMetrics metrics = algo.sortAndMeasure(data, comparator);
 
-        return new SortResponse(algo.getDisplayName(), algo.getTimeComplexity(), data.size(),
-                metrics.getComparisons(), metrics.getWrites(), metrics.getElapsedMillis(), data);
+        return new SortResponse(algo.getDisplayName(), algo.getTimeComplexity(), algo.getSpaceComplexity(),
+                data.size(), metrics.getComparisons(), metrics.getWrites(),
+                metrics.getPeakRecursionDepth(), metrics.getPeakAuxiliaryArrayElements(),
+                metrics.getElapsedMillis(), data);
     }
+
 
     @GetMapping(SortingConstant.BENCHMARK_PATH)
     public List<BenchmarkResult> benchmark(
-            @RequestParam(defaultValue = "bubble,selection,insertion,merge,quick,heap") String algorithms,
-            @RequestParam(defaultValue = "unitPrice") String field,
-            @RequestParam(defaultValue = "asc") String order,
-            @RequestParam(defaultValue = "100,1000,5000,10000") String sizes,
-            @RequestParam(defaultValue = "false") boolean force) {
+            @RequestParam(defaultValue = SortAlgorithmKeys.ALL_KEYS_CSV) String algorithms,
+            @RequestParam(defaultValue = SortableFields.UNIT_PRICE) String field,
+            @RequestParam(defaultValue = AppConstant.ORDER_ASC) String order,
+            @RequestParam(defaultValue = AppConstant.DEFAULT_BENCMARK) String sizes,
+            @RequestParam(defaultValue = AppConstant.DEFAULT_FORCE) boolean force) {
 
         List<String> algoKeys = Arrays.stream(algorithms.split(",")).map(String::trim).toList();
         List<Integer> dataSizes = Arrays.stream(sizes.split(","))
@@ -112,26 +101,25 @@ public class SortingController {
             for (int size : dataSizes) {
                 if (size > pool.size()) {
                     results.add(new BenchmarkResult(algo.getDisplayName(), algo.getTimeComplexity(),
-                            size, 0, 0, 0,
+                            algo.getSpaceComplexity(), size, 0, 0, 0, 0, 0,
                             "skipped - only " + pool.size() + " records available in the database"));
                     continue;
                 }
-                if (algo.isQuadratic() && size > QUADRATIC_SAFE_LIMIT && !force) {
+                if (algo.isQuadratic() && size > AppConstant.QUADRATIC_SAFE_LIMIT && !force) {
                     results.add(new BenchmarkResult(algo.getDisplayName(), algo.getTimeComplexity(),
-                            size, 0, 0, 0,
+                            algo.getSpaceComplexity(), size, 0, 0, 0, 0, 0,
                             "skipped - O(n^2)-class algorithm above safe cap of " +
-                                    QUADRATIC_SAFE_LIMIT + " (use force=true to override)"));
+                                    AppConstant.QUADRATIC_SAFE_LIMIT + " (use force=true to override)"));
                     continue;
                 }
 
                 List<Transaction> sample = new ArrayList<>(pool.subList(0, size));
-                SortMetrics metrics = new SortMetrics();
-                long start = System.nanoTime();
-                algo.sort(sample, comparator, metrics);
-                metrics.setElapsedNanos(System.nanoTime() - start);
+                SortMetrics metrics = algo.sortAndMeasure(sample, comparator);
 
                 results.add(new BenchmarkResult(algo.getDisplayName(), algo.getTimeComplexity(),
-                        size, metrics.getComparisons(), metrics.getWrites(), metrics.getElapsedMillis(), null));
+                        algo.getSpaceComplexity(), size, metrics.getComparisons(), metrics.getWrites(),
+                        metrics.getPeakRecursionDepth(), metrics.getPeakAuxiliaryArrayElements(),
+                        metrics.getElapsedMillis(), null));
             }
         }
         return results;

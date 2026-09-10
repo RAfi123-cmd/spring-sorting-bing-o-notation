@@ -6,16 +6,17 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.example.sorting_app.sorting.SortAlgorithm;
+import com.example.sorting_app.constant.SortAlgorithmKeys;
+import com.example.sorting_app.sorting.AbstractSortAlgorithm;
 import com.example.sorting_app.sorting.SortMetrics;
 
 @Component 
-public class BubbleSortAlgorithm implements SortAlgorithm{
+public class BubbleSortAlgorithm extends AbstractSortAlgorithm{
 
     @Override
     public String getKey() {
         // TODO Auto-generated method stub
-        return "bubble";
+        return SortAlgorithmKeys.BUBBLE;
     }
 
     @Override
@@ -37,7 +38,13 @@ public class BubbleSortAlgorithm implements SortAlgorithm{
     }
 
     @Override
-    public <T> void sort(List<T> list, Comparator<T> comparator, SortMetrics metrics) {
+    public String getSpaceComplexity() {
+        // TODO Auto-generated method stub
+        return "O(1)";
+    }
+
+    @Override
+    public <T> void doSort(List<T> list, Comparator<T> comparator, SortMetrics metrics) {
         // TODO Auto-generated method stub
         int n = list.size();
         for (int i = 0; i < n; i++) {
@@ -53,4 +60,5 @@ public class BubbleSortAlgorithm implements SortAlgorithm{
             if(!swapped) break;
         }
     }
+    
 }

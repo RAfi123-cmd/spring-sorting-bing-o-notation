@@ -10,7 +10,9 @@ public interface  SortAlgorithm {
 
     String getTimeComplexity();
 
+    String getSpaceComplexity();
+
     boolean isQuadratic();
 
-    <T> void sort(List<T> list, Comparator<T> Comparator, SortMetrics metrics);
+    <T> SortMetrics sortAndMeasure(List<T> list, Comparator<T> comparator);
 }

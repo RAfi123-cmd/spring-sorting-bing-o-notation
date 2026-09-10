@@ -1,43 +1,43 @@
 package com.example.sorting_app.sorting.impl;
 
+import com.example.sorting_app.constant.SortAlgorithmKeys;
+import com.example.sorting_app.sorting.AbstractSortAlgorithm;
+import com.example.sorting_app.sorting.SortMetrics;
+import org.springframework.stereotype.Component;
+
 import java.util.Comparator;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
-
-import com.example.sorting_app.sorting.SortAlgorithm;
-import com.example.sorting_app.sorting.SortMetrics;
-
-@Component 
-public class InsertionSortAlgorithm implements SortAlgorithm{
+@Component
+public class InsertionSortAlgorithm extends AbstractSortAlgorithm {
 
     @Override
     public String getKey() {
-        // TODO Auto-generated method stub
-        return "insertion";
+        return SortAlgorithmKeys.INSERTION;
     }
 
     @Override
     public String getDisplayName() {
-        // TODO Auto-generated method stub
         return "Insertion Sort";
     }
 
     @Override
     public String getTimeComplexity() {
-        // TODO Auto-generated method stub
         return "Best: O(n) | Average/Worst: O(n^2)";
     }
 
     @Override
+    public String getSpaceComplexity() {
+        return "O(1)";
+    }
+
+    @Override
     public boolean isQuadratic() {
-        // TODO Auto-generated method stub
         return true;
     }
 
     @Override
-    public <T> void sort(List<T> list, Comparator<T> comparator, SortMetrics metrics) {
-        // TODO Auto-generated method stub
+    protected <T> void doSort(List<T> list, Comparator<T> comparator, SortMetrics metrics) {
         int n = list.size();
         for (int i = 1; i < n; i++) {
             T key = list.get(i);
@@ -48,7 +48,7 @@ public class InsertionSortAlgorithm implements SortAlgorithm{
                     list.set(j + 1, list.get(j));
                     metrics.incrementWrites();
                     j--;
-                }else{
+                } else {
                     break;
                 }
             }
@@ -56,5 +56,4 @@ public class InsertionSortAlgorithm implements SortAlgorithm{
             metrics.incrementWrites();
         }
     }
-    
 }
