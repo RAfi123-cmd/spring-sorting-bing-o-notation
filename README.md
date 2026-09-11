@@ -7,7 +7,8 @@ rekursi, dan penggunaan memori tambahan yang **benar-benar terukur** saat
 kode dijalankan, bukan sekadar label teori.
 
 Studi kasus menggunakan dataset nyata dari Kaggle: **"E-Commerce Data"
-(Online Retail)** — `data.csv` (±540.000 baris transaksi retail UK).
+(Online Retail)** — `data.csv` (±540.000 baris transaksi retail UK) sudah
+disertakan di root project ini.
 
 ---
 
@@ -334,11 +335,11 @@ Kedua hal ini murni soal *default value* pada konstanta, bukan pada logika
 algoritma sorting-nya — begitu parameter diisi manual, seluruh endpoint
 bekerja normal seperti pada contoh-contoh di atas.
 
-## 📚 Rekomendasi Link Pembelajaran
+## Rekomendasi Link Pembelajaran
 
 Untuk memperdalam pemahaman mengenai **Sorting Algorithms** dan **Big O Notation**, berikut beberapa sumber pembelajaran yang dapat digunakan.
 
-### 📚 Sorting Algorithms — Java
+### Sorting Algorithms — Java
 
 - **[GeeksforGeeks — Sorting Algorithms in Java](https://www.geeksforgeeks.org/java/sorting-algorithms-in-java/)**  
   Penjelasan berbagai algoritma sorting menggunakan Java, termasuk **Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort,** dan **Heap Sort**. Cocok sebagai referensi implementasi algoritma pada project Java Spring Boot.
@@ -355,7 +356,7 @@ Untuk memperdalam pemahaman mengenai **Sorting Algorithms** dan **Big O Notation
 - **[VisuAlgo — Sorting](https://visualgo.net/en/sorting)**  
   Menyediakan animasi visual step-by-step untuk memahami proses **Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort,** dan **Heap Sort**. Cocok sebagai pelengkap untuk melihat cara kerja algoritma secara visual.
 
-### 📈 Big O Notation
+### Big O Notation
 
 - **[Big-O Cheat Sheet](https://www.bigocheatsheet.com/)**  
   Tabel referensi **Time Complexity** dan **Space Complexity** untuk berbagai algoritma, termasuk algoritma sorting. Menampilkan kompleksitas **Best Case, Average Case,** dan **Worst Case**.
@@ -369,7 +370,7 @@ Untuk memperdalam pemahaman mengenai **Sorting Algorithms** dan **Big O Notation
 - **[MIT OpenCourseWare — Introduction to Algorithms](https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/)**  
   Materi pembelajaran algoritma dari MIT yang mencakup analisis algoritma, asymptotic notation, serta berbagai konsep dasar algoritma.
 
-### 🎯 Rekomendasi Penggunaan
+### Rekomendasi Penggunaan
 
 | Topik | Sumber yang Direkomendasikan |
 |---|---|
