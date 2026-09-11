@@ -7,8 +7,7 @@ rekursi, dan penggunaan memori tambahan yang **benar-benar terukur** saat
 kode dijalankan, bukan sekadar label teori.
 
 Studi kasus menggunakan dataset nyata dari Kaggle: **"E-Commerce Data"
-(Online Retail)** — `data.csv` (±540.000 baris transaksi retail UK) sudah
-disertakan di root project ini.
+(Online Retail)** — `data.csv` (±540.000 baris transaksi retail UK).
 
 ---
 
