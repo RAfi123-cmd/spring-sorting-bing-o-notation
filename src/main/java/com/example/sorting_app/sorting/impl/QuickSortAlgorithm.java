@@ -5,7 +5,6 @@ import com.example.sorting_app.sorting.AbstractSortAlgorithm;
 import com.example.sorting_app.sorting.SortMetrics;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -29,15 +28,11 @@ public class QuickSortAlgorithm extends AbstractSortAlgorithm {
 
     @Override
     public String getSpaceComplexity() {
-        // In-place partitioning, but recursion uses call-stack space:
-        // O(log n) average, degrades to O(n) worst case (unbalanced partitions).
         return "Average: O(log n) | Worst: O(n)";
     }
 
     @Override
     public boolean isQuadratic() {
-        // Worst case is quadratic (already-sorted input with last-element pivot),
-        // so it is grouped with the guarded algorithms for large benchmark sizes.
         return true;
     }
 
@@ -51,28 +46,54 @@ public class QuickSortAlgorithm extends AbstractSortAlgorithm {
         if (low < high) {
             metrics.enterRecursion();
             try {
-                int pivotIndex = partition(list, low, high, comparator, metrics);
-                quickSort(list, low, pivotIndex - 1, comparator, metrics);
-                quickSort(list, pivotIndex + 1, high, comparator, metrics);
+                int[] equalRange = partition(list, low, high, comparator, metrics);
+                quickSort(list, low, equalRange[0] - 1, comparator, metrics);
+                quickSort(list, equalRange[1] + 1, high, comparator, metrics);
             } finally {
                 metrics.exitRecursion();
             }
         }
     }
 
-    private <T> int partition(List<T> list, int low, int high, Comparator<T> comparator, SortMetrics metrics) {
-        T pivot = list.get(high);
-        int i = low - 1;
-        for (int j = low; j < high; j++) {
+    private <T> int[] partition(List<T> list, int low, int high, Comparator<T> comparator, SortMetrics metrics) {
+        int middle = low + (high - low) / 2;
+        T pivot = median(list.get(low), list.get(middle), list.get(high), comparator, metrics);
+        int less = low;
+        int current = low;
+        int greater = high;
+
+        while (current <= greater) {
             metrics.incrementComparisons();
-            if (comparator.compare(list.get(j), pivot) <= 0) {
-                i++;
-                Collections.swap(list, i, j);
-                metrics.incrementWrites();
+            int comparison = comparator.compare(list.get(current), pivot);
+            if (comparison < 0) {
+                swap(list, less++, current++, metrics);
+            } else if (comparison > 0) {
+                swap(list, current, greater--, metrics);
+            } else {
+                current++;
             }
         }
-        Collections.swap(list, i + 1, high);
-        metrics.incrementWrites();
-        return i + 1;
+        return new int[]{less, greater};
+    }
+
+    private <T> T median(T first, T second, T third, Comparator<T> comparator, SortMetrics metrics) {
+        metrics.incrementComparisons();
+        if (comparator.compare(first, second) < 0) {
+            metrics.incrementComparisons();
+            return comparator.compare(second, third) < 0 ? second
+                    : comparator.compare(first, third) < 0 ? third : first;
+        }
+        metrics.incrementComparisons();
+        return comparator.compare(first, third) < 0 ? first
+                : comparator.compare(second, third) < 0 ? third : second;
+    }
+
+    private <T> void swap(List<T> list, int first, int second, SortMetrics metrics) {
+        if (first != second) {
+            T value = list.get(first);
+            list.set(first, list.get(second));
+            list.set(second, value);
+                metrics.incrementWrites();
+        }
     }
 }

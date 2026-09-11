@@ -21,7 +21,7 @@ public class SelectionSortAlgorithm extends AbstractSortAlgorithm{
     @Override
     public String getDisplayName() {
         // TODO Auto-generated method stub
-        return "Selection Merge";
+        return "Selection Sort";
     }
 
     @Override

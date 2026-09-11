@@ -37,7 +37,7 @@ public class SortMetrics {
 
     public void enterRecursion(){
         currentRecursionDepth++;
-        if (currentRecursionDepth > peakAuxiliaryArrayElements) {
+        if (currentRecursionDepth > peakRecursionDepth) {
             peakRecursionDepth = currentRecursionDepth;
         }
     }

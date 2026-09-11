@@ -47,9 +47,9 @@ public class BubbleSortAlgorithm extends AbstractSortAlgorithm{
     public <T> void doSort(List<T> list, Comparator<T> comparator, SortMetrics metrics) {
         // TODO Auto-generated method stub
         int n = list.size();
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < n - 1; i++) {
             boolean swapped = false;
-            for (int j = 0; j < n - 1; j++) {
+            for (int j = 0; j < n - i - 1; j++) {
                 metrics.incrementComparisons();
                 if (comparator.compare(list.get(j), list.get(j + 1)) > 0) {
                     Collections.swap(list, j, j + 1);
